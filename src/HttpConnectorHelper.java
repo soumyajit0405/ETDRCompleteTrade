@@ -34,8 +34,11 @@ public class HttpConnectorHelper {
 	}
 
 	
-	public JSONObject sendPostWithToken(String url, JSONObject params) throws IOException, JSONException {
+public ArrayList<JSONObject> sendPostWithToken(String url, JSONObject params) throws IOException, JSONException {
+		
+		ArrayList<JSONObject> listOfObjects = new ArrayList<>();
 		JSONObject jsonObject1 = null;
+		JSONObject js2= new JSONObject();
 		try {
 		HashMap<String,String> map = new HashMap<>();
 		JSONArray jsonObject = null;
@@ -43,7 +46,6 @@ public class HttpConnectorHelper {
 		URL obj = new URL(url);
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 		con.setRequestMethod("POST");
-		//con.setRequestProperty("Authorization", "Bearer "+token);
 		con.setRequestProperty("Content-Type", "application/json");
 		con.setDoOutput(true);
 		OutputStream os = con.getOutputStream();
@@ -64,16 +66,15 @@ public class HttpConnectorHelper {
 					response.append(inputLine);
 				}
 				jsonObject1 = new JSONObject(response.toString());
-				 jsonObject = (JSONArray)(jsonObject1.get("meterData"));
-				 if(jsonObject.length()== 0) {
-					 return new JSONObject();
-				 } else {
-				 jsonObject1 =(JSONObject)jsonObject.getJSONObject(0);
-				 }
-				 
+			if (responseCode != 200) {
+				js2.put("error", true);
+			} else {
+				js2.put("error", false);
+			}
 				in.close();
 				con.disconnect();
-				
+				listOfObjects.add(jsonObject1);
+				listOfObjects.add(js2);
 				// print result
 				System.out.println(response.toString());
 			} 
@@ -83,11 +84,71 @@ public class HttpConnectorHelper {
 			}
 			
 			System.out.println("POST request not worked");
-		}
+		
+		
+	}
 		catch(Exception e) {
-			return jsonObject1;
+			return listOfObjects;
+			
 		}
-		return jsonObject1;
+		return listOfObjects;
+	}
+	public int sendPostWithToken(String url,String token, JSONObject params) throws IOException, JSONException {
+		
+		JSONObject jsonObject1 = null;
+		try {
+		HashMap<String,String> map = new HashMap<>();
+		JSONArray jsonObject = null;
+		
+		URL obj = new URL(url);
+		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+		con.setRequestMethod("POST");
+		con.setRequestProperty("Authorization", "Bearer "+token);
+		con.setRequestProperty("Content-Type", "application/json");
+		con.setDoOutput(true);
+		OutputStream os = con.getOutputStream();
+		System.out.println(params.toString());
+		os.write(params.toString().getBytes());	
+		os.flush();
+		os.close();
+		int responseCode = con.getResponseCode();
+		System.out.println("POST Response Code :: " + responseCode);
+
+		if (responseCode == HttpURLConnection.HTTP_OK) { //success
+			BufferedReader in = new BufferedReader(new InputStreamReader(
+					con.getInputStream()));
+			String inputLine;
+			StringBuffer response = new StringBuffer();
+
+				while ((inputLine = in.readLine()) != null) {
+					response.append(inputLine);
+				}
+				jsonObject1 = new JSONObject(response.toString());
+				
+				 in.close();
+				con.disconnect();
+				 if ((int)jsonObject1.get("status") == 1 && responseCode == 200) {
+					 return 1;
+				 }  else {
+					 return 0;
+				 }
+			
+			} 
+			
+		else {
+				System.out.println("POST request not worked");
+			}
+			
+			System.out.println("POST request not worked");
+		
+		
+	}
+		catch(Exception e) {
+			return -1;
+			
+		}
+		return 1;
 	}
 
+	
 }

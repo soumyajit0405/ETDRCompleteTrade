@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -23,38 +24,41 @@ class EventCustomerThread implements Runnable {
 
 	public void run() {
 		try {
-			ScheduleDAO sdc= new ScheduleDAO();
-			//ArrayList<HashMap<String,Object>> listOfCustomerData=sdc.getEventCustomerData(customerId);
+		ScheduleDAO sdc= new ScheduleDAO();
+			ArrayList<HashMap<String,Object>> listOfCustomerData=sdc.getEventCustomerData(customerId, eventId);
 			//Invoke node Api
-			
-//			if (listOfCustomerData.size() > 0) {
-//
-//				ExecutorService executor = Executors.newFixedThreadPool(listOfCustomerData.size());// creating a pool of 1000
-//																							// threads
-//				for (int i = 0; i < listOfCustomerData.size(); i++) {
-//					Runnable worker = new EventCustomerSwitchesThread(
-//							(int)listOfCustomerData.get(i).get("deviceId"),
-//							(int)listOfCustomerData.get(i).get("kiotUserMappingId"),
-//							(int)listOfCustomerData.get(i).get("kiotUserId"),
-//							(String)listOfCustomerData.get(i).get("bearerToken"),
-//							(int)listOfCustomerData.get(i).get("kiotDeviceId"),
-//							(String)listOfCustomerData.get(i).get("switchNumber"),
-//							(String)listOfCustomerData.get(i).get("connectionString"));
-//					System.out.println("List of run workers");
-//					executor.execute(worker);// calling execute method of ExecutorService
-//				}
-//				executor.shutdown();
-//				while (!executor.isTerminated()) {
-//				}
-			
-	//		}
-		TimeUnit.SECONDS.sleep(2);
-		getTxData();
-			
-	} catch (ClassNotFoundException e) {
+			System.out.println("Start EventCustomerThread");
+			if (listOfCustomerData.size() > 0) {
+
+				ExecutorService executor = Executors.newFixedThreadPool(listOfCustomerData.size());// creating a pool of 1000
+																							// threads
+				for (int i = 0; i < listOfCustomerData.size(); i++) {
+					Runnable worker = new EventCustomerSwitchesThread(
+							(String)listOfCustomerData.get(i).get("kiotDeviceId"),
+							(int)listOfCustomerData.get(i).get("kiotUserMappingId"),
+							(String)listOfCustomerData.get(i).get("kiotUserId"),
+							(String)listOfCustomerData.get(i).get("bearerToken"),
+							(String)listOfCustomerData.get(i).get("customData"),
+							"",
+							eventId, customerId);
+					System.out.println("List of run EventCustomerThread");
+					executor.execute(worker);// calling execute method of ExecutorService
+				}
+				executor.shutdown();
+				while (!executor.isTerminated()) {
+				}
+
+		}
+			TimeUnit.SECONDS.sleep(10);
+			getTxData();
+		 
+		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (JSONException e) {
@@ -63,11 +67,7 @@ class EventCustomerThread implements Runnable {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
-		
+		}
 		finally {
 			if (ScheduleDAO.con != null) {
 //				try {
@@ -91,23 +91,36 @@ class EventCustomerThread implements Runnable {
 	
 	public void getTxData() throws ClassNotFoundException, SQLException, JSONException, IOException {
 		ScheduleDAO scd= new ScheduleDAO();
-		double meterReading= 0;
-		DBHelper dbhelper = new DBHelper();
-		HttpConnectorHelper httpconnectorhelper= new HttpConnectorHelper();
-		JSONObject inputDetails1= new JSONObject();
-		inputDetails1.put("meterId", 6);
-		// inputDetails1.put("timestamp", "2020-06-07 21:15:00");
-			inputDetails1.put("timestamp", startTime);
-		JSONObject responseFromDevice = httpconnectorhelper
-				.sendPostWithToken(scd.getConnectionString(customerId), inputDetails1);
-		if(responseFromDevice.isNull("meterReading")) {
-			meterReading = 0;
-		} else {
-			meterReading = (double)responseFromDevice.get("meterReading");
-		}
-		// HashMap<String,String> responseAfterParse =
-		// cm.parseInput(responseFrombcnetwork);
-			dbhelper.updateEventCustomer(meterReading,eventId,customerId);
-		
+		if (scd.getEventCustomerStatus(customerId, eventId) != 12) {
+
+			JSONArray meterArray = new JSONArray();
+			double meterReading=0;
+			DBHelper dbhelper = new DBHelper();
+			HttpConnectorHelper httpconnectorhelper= new HttpConnectorHelper();
+			JSONObject inputDetails1= new JSONObject();
+			inputDetails1.put("meterId", 6);
+			//inputDetails1.put("timestamp", "2020-06-19 19:15:00");
+			inputDetails1.put("timestamp", this.startTime);
+			ArrayList<JSONObject> responseFromDevice = httpconnectorhelper
+					.sendPostWithToken(scd.getConnectionString(customerId,eventId), inputDetails1);
+			// HashMap<String,String> responseAfterParse =
+			// cm.parseInput(responseFrombcnetwork);
+			if ((boolean)responseFromDevice.get(1).get("error")) {
+				dbhelper.updateEventCustomer(meterReading,WorkerThread.eventId,customerId,"e");
+			}
+			if(responseFromDevice.get(0).isNull("meterData")) {
+				meterReading = 0;
+			} else {
+				meterArray = (JSONArray)responseFromDevice.get(0).get("meterData");
+				if (meterArray.length() > 0) {
+				JSONObject js =(JSONObject) meterArray.get(0);
+				meterReading = (double)js.get("meterReading");
+				}
+				
+			}
+				dbhelper.updateEventCustomer(meterReading,WorkerThread.eventId,customerId,"ne");
+			
+		}	
 	}
+	
 }
