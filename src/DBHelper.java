@@ -10,7 +10,7 @@ public class DBHelper {
 
 	static Connection con;
 	 
-	 public void updateEventCustomer(double meterReading, int eventId, int userId) throws SQLException, ClassNotFoundException
+	 public void updateEventCustomer(double meterReading, int eventId, int userId, String status) throws SQLException, ClassNotFoundException
 		{
 		try {	
 		 //JDBCConnection connref =new JDBCConnection();
@@ -21,14 +21,7 @@ public class DBHelper {
 			double actualPower=0;
 			if(ScheduleDAO.con!=null)
 			{ 
-				if (meterReading == 0) {
-					String query="update event_customer_mapping set event_customer_status_id=14 where event_id =? and customer_id=?";
-					  pstmt=ScheduleDAO.con.prepareStatement(query);
-					  pstmt.setInt(1,eventId); 
-					  pstmt.setInt(2,userId); 
-					  pstmt.execute();
-					
-				} else {
+				if (status.equalsIgnoreCase("ne") && meterReading !=0) {
 					String query="update event_customer_mapping set customer_net_meter_reading_e=? ,actual_power=(1-(?-customer_net_meter_reading_s)*4),event_customer_status_id=8 where event_id =? and customer_id=?";
 					  pstmt=ScheduleDAO.con.prepareStatement(query);
 					  pstmt.setDouble(1,meterReading);
@@ -51,9 +44,16 @@ public class DBHelper {
 					  pstmt.setDouble(1,actualPower);
 					  pstmt.setInt(2,eventId); 
 					  pstmt.execute();
-					  validate(eventId,userId); 
-					
-			}
+					//  validate(eventId,userId); 
+			
+				} else {
+						String query="update event_customer_mapping set event_customer_status_id=11 where event_id=? and customer_id=?";
+						  pstmt=ScheduleDAO.con.prepareStatement(query);
+						  pstmt.setInt(1,eventId); 
+						  pstmt.setInt(2,userId); 
+						  pstmt.execute();
+				}
+				
 			}
 			}
 		
@@ -113,41 +113,41 @@ public class DBHelper {
 
 		}
 	 
-	 public void updateEventCustomer(double meterReading, int eventId, int userId, String status) throws SQLException, ClassNotFoundException
-		{
-		try {	
-		 //JDBCConnection connref =new JDBCConnection();
-		 if (ScheduleDAO.con == null ) {
-				con = JDBCConnection.getOracleConnection();
-		 } 
-			PreparedStatement pstmt = null;
-			String deviceName="";
-			if(ScheduleDAO.con!=null)
-			{
-				if (status.equalsIgnoreCase("ne") && meterReading !=0) {
-					String query="update event_customer_mapping set customer_net_meter_reading_s=?,event_customer_status_id=13 where event_id=? and customer_id=?";
-					  pstmt=ScheduleDAO.con.prepareStatement(query);
-					  pstmt.setDouble(1,meterReading);
-					  pstmt.setInt(2,eventId); 
-					  pstmt.setInt(3,userId); 
-					  pstmt.execute();
-				} else {
-					String query="update event_customer_mapping set event_customer_status_id=11 where event_id=? and customer_id=?";
-					  pstmt=ScheduleDAO.con.prepareStatement(query);
-					  pstmt.setInt(1,eventId); 
-					  pstmt.setInt(2,userId); 
-					  pstmt.execute();
-				}
-					 
-					 
-					
-			}
-			}
-		
-	 catch(Exception e) {
-		 e.printStackTrace();
-	 }
-		}
+//	 public void updateEventCustomer(double meterReading, int eventId, int userId, String status) throws SQLException, ClassNotFoundException
+//		{
+//		try {	
+//		 //JDBCConnection connref =new JDBCConnection();
+//		 if (ScheduleDAO.con == null ) {
+//				con = JDBCConnection.getOracleConnection();
+//		 } 
+//			PreparedStatement pstmt = null;
+//			String deviceName="";
+//			if(ScheduleDAO.con!=null)
+//			{
+//				if (status.equalsIgnoreCase("ne") && meterReading !=0) {
+//					String query="update event_customer_mapping set customer_net_meter_reading_s=?,event_customer_status_id=13 where event_id=? and customer_id=?";
+//					  pstmt=ScheduleDAO.con.prepareStatement(query);
+//					  pstmt.setDouble(1,meterReading);
+//					  pstmt.setInt(2,eventId); 
+//					  pstmt.setInt(3,userId); 
+//					  pstmt.execute();
+//				} else {
+//					String query="update event_customer_mapping set event_customer_status_id=11 where event_id=? and customer_id=?";
+//					  pstmt=ScheduleDAO.con.prepareStatement(query);
+//					  pstmt.setInt(1,eventId); 
+//					  pstmt.setInt(2,userId); 
+//					  pstmt.execute();
+//				}
+//					 
+//					 
+//					
+//			}
+//			}
+//		
+//	 catch(Exception e) {
+//		 e.printStackTrace();
+//	 }
+//		}
 		
 		public void updateEventCustomer( int eventId, int userId) throws SQLException, ClassNotFoundException
 		{
@@ -185,5 +185,33 @@ public class DBHelper {
 	 }
 
 		}
-	 
+
+		public void updateEventCustomerToLive( int eventId, int userId) throws SQLException, ClassNotFoundException
+		{
+		try {	
+		 //JDBCConnection connref =new JDBCConnection();
+		 if (ScheduleDAO.con == null ) {
+				con = JDBCConnection.getOracleConnection();
+		 } 
+			PreparedStatement pstmt = null;
+			int customerStatus=0;
+			if(ScheduleDAO.con!=null)
+			{
+				String query="update event_customer_mapping set event_customer_status_id=8 where event_id=? and customer_id=?";
+					  pstmt=ScheduleDAO.con.prepareStatement(query);
+					  pstmt.setInt(1,eventId); 
+					  pstmt.setInt(2,userId); 
+					  pstmt.execute();
+				  }	 
+					 
+					
+			}
+			
+		
+	 catch(Exception e) {
+		 e.printStackTrace();
+	 }
+
+		
+}
 }

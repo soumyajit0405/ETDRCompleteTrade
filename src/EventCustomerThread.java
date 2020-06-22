@@ -49,8 +49,8 @@ class EventCustomerThread implements Runnable {
 				}
 
 		}
-			TimeUnit.SECONDS.sleep(10);
-			getTxData();
+			//TimeUnit.SECONDS.sleep(10);
+			//getTxData();
 		 
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -58,16 +58,7 @@ class EventCustomerThread implements Runnable {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} 
 		finally {
 			if (ScheduleDAO.con != null) {
 //				try {
