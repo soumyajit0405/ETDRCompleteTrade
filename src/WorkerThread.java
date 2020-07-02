@@ -9,7 +9,7 @@ import java.util.concurrent.Executors;
 import org.json.JSONObject;
 
 class WorkerThread implements Runnable {
-	public static int eventId;
+	public int eventId;
 	public String startTime;
 	
 	public WorkerThread(int eventId, String startTime) {

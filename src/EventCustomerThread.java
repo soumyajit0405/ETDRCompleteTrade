@@ -97,7 +97,7 @@ class EventCustomerThread implements Runnable {
 			// HashMap<String,String> responseAfterParse =
 			// cm.parseInput(responseFrombcnetwork);
 			if ((boolean)responseFromDevice.get(1).get("error")) {
-				dbhelper.updateEventCustomer(meterReading,WorkerThread.eventId,customerId,"e");
+				dbhelper.updateEventCustomer(meterReading,eventId,customerId,"e");
 			}
 			if(responseFromDevice.get(0).isNull("meterData")) {
 				meterReading = 0;
@@ -109,7 +109,7 @@ class EventCustomerThread implements Runnable {
 				}
 				
 			}
-				dbhelper.updateEventCustomer(meterReading,WorkerThread.eventId,customerId,"ne");
+				dbhelper.updateEventCustomer(meterReading,eventId,customerId,"ne");
 			
 		}	
 	}

@@ -16,7 +16,7 @@ public class ScheduleDAO {
 	static Connection con;
 	Statement stmt = null;
 	PreparedStatement pStmt = null;
-	static String startTime="";
+	 String startTime="";
 	 public ArrayList<HashMap<String,Object>> getEvents(String date, String time) throws SQLException, ClassNotFoundException
 	 {
 		 PreparedStatement pstmt = null;

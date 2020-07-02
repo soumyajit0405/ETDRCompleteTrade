@@ -15,11 +15,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class HttpConnectorHelper {
-	private static final String USER_AGENT = "Mozilla/5.0";
+	private  final String USER_AGENT = "Mozilla/5.0";
 
-	private static final String GET_URL = "https://localhost:9090/SpringMVCExample";
+	private  final String GET_URL = "https://localhost:9090/SpringMVCExample";
 
-	private static final String POST_URL = "http://168.61.22.57:6380/createuser";
+	private  final String POST_URL = "http://168.61.22.57:6380/createuser";
 
 	
 	public static void main(String[] args) throws IOException, JSONException {
@@ -127,6 +127,7 @@ public ArrayList<JSONObject> sendPostWithToken(String url, JSONObject params) th
 				
 				 in.close();
 				con.disconnect();
+				System.out.println("Response :" + (int)jsonObject1.get("status") + responseCode);
 				 if ((int)jsonObject1.get("status") == 1 && responseCode == 200) {
 					 return 1;
 				 }  else {
@@ -136,19 +137,19 @@ public ArrayList<JSONObject> sendPostWithToken(String url, JSONObject params) th
 			} 
 			
 		else {
+			
 				System.out.println("POST request not worked");
+				return 0;
 			}
 			
-			System.out.println("POST request not worked");
 		
 		
 	}
 		catch(Exception e) {
-			return -1;
+			return 0;
 			
 		}
-		return 1;
 	}
 
 	
-}
+} 
