@@ -30,7 +30,7 @@ public class ScheduleDAO {
 		//	System.out.println("select aso.sell_order_id,ubc.private_key,ubc.public_key,abc.order_id from all_sell_orders aso,all_blockchain_orders abc, user_blockchain_keys ubc where aso.transfer_start_ts ='"+date+" "+time+"' and abc.general_order_id=aso.sell_order_id and abc.order_type='SELL_ORDER' and ubc.user_id  = aso.seller_id and aso.order_status_id=1");
 		 // String query="select aso.sell_order_id,ubc.private_key,ubc.public_key,abc.order_id,abc.all_blockchain_orders_id from all_sell_orders aso,all_blockchain_orders abc, user_blockchain_keys ubc where aso.transfer_start_ts ='"+date+" "+time+"' and abc.general_order_id=aso.sell_order_id and abc.order_type='SELL_ORDER' and ubc.user_id  = aso.seller_id and aso.order_status_id=3";
 		 	String query="select a.event_id from all_events a where  a.event_status_id= 8 and a.event_end_time ='"+date+" "+time+"'";
-			//String query="select a.event_id from all_events a where  a.event_status_id= 8 and a.event_end_time ='2021-06-28 01:30:00'";
+			//String query="select a.event_id from all_events a where  a.event_status_id= 8 and a.event_end_time ='2020-08-13 17:45:00'";
 			pstmt=con.prepareStatement(query);
 		// pstmt.setString(1,controllerId);
 		 ResultSet rs= pstmt.executeQuery();
@@ -82,7 +82,7 @@ public class ScheduleDAO {
 		 
 				query =" update all_event_sets set status_id=5 where event_set_id =?";
 				pstmst1=con.prepareStatement(query);
-				pstmst1.setInt(1, rs.getInt("event_set_id"));
+				pstmst1.setInt(1, eventSetId);
 				pstmst1.execute();
 		 
 	 }
