@@ -20,13 +20,13 @@ class WorkerThread implements Runnable {
 	public void run() {
 		try {
 			ScheduleDAO sdc= new ScheduleDAO();
-			ArrayList<Integer> listOfCustomers=sdc.getEventCustomer(eventId);
+			ArrayList<HashMap<String,Object>> listOfCustomers=sdc.getEventCustomer(eventId);
 			if (listOfCustomers.size() > 0) {
 
 				ExecutorService executor = Executors.newFixedThreadPool(listOfCustomers.size());// creating a pool of 1000
 																							// threads
 				for (int i = 0; i < listOfCustomers.size(); i++) {
-					Runnable worker = new EventCustomerThread((int) listOfCustomers.get(i),startTime,eventId );
+					Runnable worker = new EventCustomerThread((int) listOfCustomers.get(i).get("customerId"),(int) listOfCustomers.get(i).get("eventCustomerMapping"),startTime,eventId );
 					System.out.println("List of run workers");
 					executor.execute(worker);// calling execute method of ExecutorService
 				}

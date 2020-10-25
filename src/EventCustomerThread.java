@@ -13,19 +13,21 @@ import org.json.JSONObject;
 
 class EventCustomerThread implements Runnable {
 	public  int customerId;
+	public int eventCustomerMapping;
 	public  String startTime;
 	public int eventId;
 	
-	public EventCustomerThread(int customerId, String startTime, int eventId) {
+	public EventCustomerThread(int customerId,int eventCustomerMapping, String startTime, int eventId) {
 		this.customerId = customerId;
 		this.startTime = startTime;
 		this.eventId = eventId;
+		this.eventCustomerMapping = eventCustomerMapping;
 	}
 
 	public void run() {
 		try {
 		ScheduleDAO sdc= new ScheduleDAO();
-			ArrayList<HashMap<String,Object>> listOfCustomerData=sdc.getEventCustomerData(customerId, eventId);
+			ArrayList<HashMap<String,Object>> listOfCustomerData=sdc.getEventCustomerData(customerId,eventCustomerMapping, eventId);
 			//Invoke node Api
 			System.out.println("Start EventCustomerThread");
 			if (listOfCustomerData.size() > 0) {
@@ -40,7 +42,7 @@ class EventCustomerThread implements Runnable {
 							(String)listOfCustomerData.get(i).get("bearerToken"),
 							(String)listOfCustomerData.get(i).get("customData"),
 							"",
-							eventId, customerId);
+							eventId, customerId,(int)listOfCustomerData.get(i).get("deviceTypeId"),(String)listOfCustomerData.get(i).get("deviceName"));
 					System.out.println("List of run EventCustomerThread");
 					executor.execute(worker);// calling execute method of ExecutorService
 				}

@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -112,7 +113,7 @@ public ArrayList<JSONObject> sendPostWithToken(String url, JSONObject params) th
 		os.flush();
 		os.close();
 		int responseCode = con.getResponseCode();
-		System.out.println("POST Response Code :: " + responseCode);
+		System.out.println(new Timestamp(System.currentTimeMillis())+ "POST Response Code :: " + responseCode + "   "+params.toString());
 
 		if (responseCode == HttpURLConnection.HTTP_OK) { //success
 			BufferedReader in = new BufferedReader(new InputStreamReader(
@@ -127,7 +128,7 @@ public ArrayList<JSONObject> sendPostWithToken(String url, JSONObject params) th
 				
 				 in.close();
 				con.disconnect();
-				System.out.println("Response :" + (int)jsonObject1.get("status") + responseCode);
+				System.out.println(new Timestamp(System.currentTimeMillis())+ "Response :" + (int)jsonObject1.get("status") + responseCode +"  "+params.toString());
 				 if ((int)jsonObject1.get("status") == 1 && responseCode == 200) {
 					 return 1;
 				 }  else {
