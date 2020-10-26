@@ -17,6 +17,7 @@ public class DBHelper {
 		 if (ScheduleDAO.con == null ) {
 				con = JDBCConnection.getOracleConnection();
 		 } 
+		 
 			PreparedStatement pstmt = null;
 			double actualPower=0;
 			if(ScheduleDAO.con!=null)
