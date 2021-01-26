@@ -20,7 +20,7 @@ public class ActionThreadPoolExecutor {
 				ExecutorService executor = Executors.newFixedThreadPool(eventsList.size());// creating a pool of 1000
 																							// threads
 				for (int i = 0; i < eventsList.size(); i++) {
-					Runnable worker = new WorkerThread((int) eventsList.get(i).get("eventId"), (String) eventsList.get(i).get("startTime"));
+					Runnable worker = new WorkerThread((int) eventsList.get(i).get("eventId"), (String) eventsList.get(i).get("startTime"),(int) eventsList.get(i).get("eventTypeId"));
 					System.out.println("List of run workers");
 					executor.execute(worker);// calling execute method of ExecutorService
 				}

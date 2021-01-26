@@ -11,32 +11,39 @@ import org.json.JSONObject;
 class WorkerThread implements Runnable {
 	public int eventId;
 	public String startTime;
+	public int eventTypeId;
 	
-	public WorkerThread(int eventId, String startTime) {
+	public WorkerThread(int eventId, String startTime, int eventTypeId) {
 		this.eventId = eventId;
 		this.startTime = startTime;
+		this.eventTypeId = eventTypeId;
 	}
 
 	public void run() {
 		try {
 			ScheduleDAO sdc= new ScheduleDAO();
-			ArrayList<HashMap<String,Object>> listOfCustomers=sdc.getEventCustomer(eventId);
-			if (listOfCustomers.size() > 0) {
+			if (eventTypeId == 1) {
+				ArrayList<HashMap<String,Object>> listOfCustomers=sdc.getEventCustomer(eventId);
+				if (listOfCustomers.size() > 0) {
 
-				ExecutorService executor = Executors.newFixedThreadPool(listOfCustomers.size());// creating a pool of 1000
-																							// threads
-				for (int i = 0; i < listOfCustomers.size(); i++) {
-					Runnable worker = new EventCustomerThread((int) listOfCustomers.get(i).get("customerId"),(int) listOfCustomers.get(i).get("eventCustomerMapping"),startTime,eventId );
-					System.out.println("List of run workers");
-					executor.execute(worker);// calling execute method of ExecutorService
+					ExecutorService executor = Executors.newFixedThreadPool(listOfCustomers.size());// creating a pool of 1000
+																								// threads
+					for (int i = 0; i < listOfCustomers.size(); i++) {
+						Runnable worker = new EventCustomerThread((int) listOfCustomers.get(i).get("customerId"),(int) listOfCustomers.get(i).get("eventCustomerMapping"),startTime,eventId );
+						System.out.println("List of run workers");
+						executor.execute(worker);// calling execute method of ExecutorService
+					}
+					sdc.updateEventStatus(eventId,startTime);
+					executor.shutdown();
+					while (!executor.isTerminated()) {
+					}
+					
 				}
-				sdc.updateEventStatus(eventId);
-				executor.shutdown();
-				while (!executor.isTerminated()) {
-				}
-				
+				sdc.updateEventStatus(eventId,startTime);				
+			} else {
+				sdc.updateEventStatus(eventId,startTime);
 			}
-			sdc.updateEventStatus(eventId);
+
 
 			
 	} catch (ClassNotFoundException e) {
